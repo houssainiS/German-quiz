@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>houssaini A1 - German Article Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    /* <CHANGE> Add start screen styles */
+    .start-screen {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+    }
+
+    .start-screen.hidden {
+      display: none;
+    }
+
+    .start-title {
+      font-size: 48px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .start-subtitle {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .start-description {
+      background: #f0f4ff;
+      padding: 20px;
+      border-radius: 12px;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.8;
+      text-align: left;
+      margin: 20px 0;
+    }
+
+    .start-description strong {
+      color: #667eea;
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 8px;
+    }
+
+    .start-description strong:first-child {
+      margin-top: 0;
+    }
+
+    #startBtn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 40px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      min-width: 200px;
+    }
+
+    #startBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .quiz-screen {
+      display: none;
+    }
+
+    .quiz-screen.active {
+      display: block;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .timer-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding: 15px;
+      background: #f8f9ff;
+      border-radius: 12px;
+    }
+
+    .timer {
+      font-size: 24px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .timer.warning {
+      color: #ff6b6b;
+      animation: pulse 0.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .score-display {
+      font-size: 14px;
+      color: #666;
+      font-weight: 600;
+    }
+
+    #quiz {
+      margin-bottom: 25px;
+      max-height: 500px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    #quiz::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #quiz::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    #quiz::-webkit-scrollbar-thumb {
+      background: #667eea;
+      border-radius: 10px;
+    }
+
+    .question {
+      background: #f8f9ff;
+      margin-bottom: 15px;
+      padding: 16px;
+      border-radius: 12px;
+      border-left: 4px solid #667eea;
+      transition: all 0.3s ease;
+    }
+
+    .question:hover {
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    }
+
+    .question-number {
+      font-size: 12px;
+      color: #999;
+      font-weight: 600;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .word {
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 12px;
+    }
+
+    .options {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: white;
+      border: 2px solid #e0e0e0;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .option-label:hover {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+
+    .option-label input[type="radio"] {
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .option-label input[type="radio"]:checked + span {
+      color: #667eea;
+      font-weight: 700;
+    }
+
+    .option-label.correct {
+      border-color: #51cf66;
+      background: #f0fdf4;
+    }
+
+    .option-label.correct input[type="radio"]:checked + span {
+      color: #51cf66;
+    }
+
+    .option-label.incorrect {
+      border-color: #ff6b6b;
+      background: #fef2f2;
+    }
+
+    .option-label.incorrect input[type="radio"]:checked + span {
+      color: #ff6b6b;
+    }
+
+    .correct-answer-hint {
+      display: none;
+      font-size: 13px;
+      color: #51cf66;
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: #f0fdf4;
+      border-radius: 8px;
+      border-left: 3px solid #51cf66;
+      font-weight: 600;
+    }
+
+    .correct-answer-hint.show {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    .show-meaning {
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .show-meaning:hover {
+      background: #764ba2;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .translation {
+      display: none;
+      font-size: 13px;
+      color: #555;
+      margin-top: 10px;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      line-height: 1.6;
+    }
+
+    .translation.show {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    button {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    #submitBtn {
+      background: #667eea;
+      color: white;
+    }
+
+    #submitBtn:hover {
+      background: #764ba2;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    #newRoundBtn {
+      background: #51cf66;
+      color: white;
+      display: none;
+    }
+
+    #newRoundBtn:hover {
+      background: #40c057;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(81, 207, 102, 0.3);
+    }
+
+    #result {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: #667eea;
+      margin-top: 20px;
+      padding: 20px;
+      background: #f0f4ff;
+      border-radius: 12px;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 25px;
+      }
+
+      .title {
+        font-size: 24px;
+      }
+
+      .start-title {
+        font-size: 36px;
+      }
+
+      .options {
+        gap: 8px;
+      }
+
+      .option-label {
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- <CHANGE> Add start screen section -->
+    <div class="start-screen" id="startScreen">
+      <div class="start-title">houssaini A1</div>
+      <div class="start-subtitle">Master German Articles: der, die, das</div>
+      <div class="start-description">
+        <strong>How it works:</strong>
+        ✅ 10 random words each round<br>
+        ✅ Timer (30 seconds)<br>
+        ✅ Select der, die, das<br>
+        ✅ "Show Meaning" buttons for Arabic + English translation<br>
+        ✅ Score display after each round<br>
+        ✅ New round button to continue
+      </div>
+      <button id="startBtn">Start Quiz</button>
+    </div>
+
+    <!-- <CHANGE> Wrap quiz content in quiz-screen div -->
+    <div class="quiz-screen" id="quizScreen">
+      <div class="header">
+        <div class="title">houssaini A1</div>
+        <div class="subtitle">Master German Articles: der, die, das</div>
+      </div>
+
+      <div class="timer-section">
+        <div class="timer" id="timer">⏳ 30s</div>
+        <div class="score-display">Round: <span id="roundCount">1</span></div>
+      </div>
+
+      <form id="quiz"></form>
+
+      <div class="buttons">
+        <button id="submitBtn">Submit Answers</button>
+        <button id="newRoundBtn">New Round</button>
+      </div>
+
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <script>
+    const allWords = [
+      // ... existing code ...
+      { word: "Brot", article: "das", arabic: "الخبز", english: "bread" },
+      { word: "Milch", article: "die", arabic: "الحليب", english: "milk" },
+      { word: "Wasser", article: "das", arabic: "الماء", english: "water" },
+      { word: "Apfel", article: "der", arabic: "التفاح", english: "apple" },
+      { word: "Banane", article: "die", arabic: "الموز", english: "banana" },
+      { word: "Saft", article: "der", arabic: "العصير", english: "juice" },
+      { word: "Käse", article: "der", arabic: "الجبن", english: "cheese" },
+      { word: "Ei", article: "das", arabic: "البيضة", english: "egg" },
+      { word: "Gemüse", article: "das", arabic: "الخضار", english: "vegetables" },
+      { word: "Obst", article: "das", arabic: "الفواكه", english: "fruit" },
+      { word: "Fleisch", article: "das", arabic: "اللحم", english: "meat" },
+      { word: "Hähnchen", article: "das", arabic: "الدجاج", english: "chicken" },
+      { word: "Fisch", article: "der", arabic: "السمك", english: "fish" },
+      { word: "Reis", article: "der", arabic: "الأرز", english: "rice" },
+      { word: "Salz", article: "das", arabic: "الملح", english: "salt" },
+      { word: "Zucker", article: "der", arabic: "السكر", english: "sugar" },
+      { word: "Haus", article: "das", arabic: "المنزل", english: "house" },
+      { word: "Tür", article: "die", arabic: "الباب", english: "door" },
+      { word: "Fenster", article: "das", arabic: "النافذة", english: "window" },
+      { word: "Tisch", article: "der", arabic: "الطاولة", english: "table" },
+      { word: "Stuhl", article: "der", arabic: "الكرسي", english: "chair" },
+      { word: "Lampe", article: "die", arabic: "المصباح", english: "lamp" },
+      { word: "Bett", article: "das", arabic: "السرير", english: "bed" },
+      { word: "Kühlschrank", article: "der", arabic: "الثلاجة", english: "fridge" },
+      { word: "Uhr", article: "die", arabic: "الساعة", english: "clock" },
+      { word: "Handy", article: "das", arabic: "الهاتف المحمول", english: "mobile phone" },
+      { word: "Sofa", article: "das", arabic: "الأريكة", english: "sofa" },
+      { word: "Fernseher", article: "der", arabic: "التلفاز", english: "television" },
+      { word: "Küche", article: "die", arabic: "المطبخ", english: "kitchen" },
+      { word: "Badezimmer", article: "das", arabic: "الحمام", english: "bathroom" },
+      { word: "Stift", article: "der", arabic: "القلم", english: "pen" },
+      { word: "Bleistift", article: "der", arabic: "قلم رصاص", english: "pencil" },
+      { word: "Radiergummi", article: "der", arabic: "ممحاة", english: "eraser" },
+      { word: "Heft", article: "das", arabic: "الدفتر", english: "notebook" },
+      { word: "Buch", article: "das", arabic: "الكتاب", english: "book" },
+      { word: "Schule", article: "die", arabic: "المدرسة", english: "school" },
+      { word: "Lehrer", article: "der", arabic: "المعلم", english: "teacher (male)" },
+      { word: "Lehrerin", article: "die", arabic: "المعلمة", english: "teacher (female)" },
+      { word: "Schüler", article: "der", arabic: "التلميذ", english: "student (male)" },
+      { word: "Schülerin", article: "die", arabic: "التلميذة", english: "student (female)" },
+      { word: "Rucksack", article: "der", arabic: "الحقيبة", english: "backpack" },
+      { word: "Lineal", article: "das", arabic: "المسطرة", english: "ruler" },
+      { word: "Tafel", article: "die", arabic: "السبورة", english: "blackboard" },
+      { word: "Computer", article: "der", arabic: "الكمبيوتر", english: "computer" },
+      { word: "Marker", article: "der", arabic: "قلم تعليم", english: "marker" },
+      { word: "Blatt", article: "das", arabic: "الورقة", english: "sheet/paper" },
+      { word: "Mann", article: "der", arabic: "الرجل", english: "man" },
+      { word: "Frau", article: "die", arabic: "المرأة", english: "woman" },
+      { word: "Kind", article: "das", arabic: "الطفل", english: "child" },
+      { word: "Vater", article: "der", arabic: "الأب", english: "father" },
+      { word: "Mutter", article: "die", arabic: "الأم", english: "mother" },
+      { word: "Bruder", article: "der", arabic: "الأخ", english: "brother" },
+      { word: "Schwester", article: "die", arabic: "الأخت", english: "sister" },
+      { word: "Freund", article: "der", arabic: "الصديق", english: "friend (male)" },
+      { word: "Freundin", article: "die", arabic: "الصديقة", english: "friend (female)" },
+      { word: "Nachbar", article: "der", arabic: "الجار", english: "neighbor (m)" },
+      { word: "Nachbarin", article: "die", arabic: "الجارة", english: "neighbor (f)" },
+      { word: "Baum", article: "der", arabic: "الشجرة", english: "tree" },
+      { word: "Blume", article: "die", arabic: "الزهرة", english: "flower" },
+      { word: "Berg", article: "der", arabic: "الجبل", english: "mountain" },
+      { word: "Fluss", article: "der", arabic: "النهر", english: "river" },
+      { word: "See", article: "der", arabic: "البحيرة", english: "lake" },
+      { word: "Meer", article: "das", arabic: "البحر", english: "sea" },
+      { word: "Sonne", article: "die", arabic: "الشمس", english: "sun" },
+      { word: "Mond", article: "der", arabic: "القمر", english: "moon" },
+      { word: "Himmel", article: "der", arabic: "السماء", english: "sky" },
+      { word: "Schlüssel", article: "der", arabic: "المفتاح", english: "key" },
+      { word: "Tasche", article: "die", arabic: "الحقيبة", english: "bag" },
+      { word: "Ball", article: "der", arabic: "الكرة", english: "ball" },
+      { word: "Brille", article: "die", arabic: "النظارات", english: "glasses" },
+      { word: "Messer", article: "das", arabic: "السكين", english: "knife" },
+      { word: "Gabel", article: "die", arabic: "الشوكة", english: "fork" },
+      { word: "Löffel", article: "der", arabic: "الملعقة", english: "spoon" },
+      { word: "Glas", article: "das", arabic: "الكأس", english: "glass/cup" },
+      { word: "Flasche", article: "die", arabic: "القنينة", english: "bottle" },
+      { word: "Regenschirm", article: "der", arabic: "المظلة", english: "umbrella" }
+    ];
+
+    let selectedWords = [];
+    let timer = 30;
+    let interval;
+    let roundCount = 1;
+
+    const startScreen = document.getElementById("startScreen");
+    const quizScreen = document.getElementById("quizScreen");
+    const startBtn = document.getElementById("startBtn");
+    const quizForm = document.getElementById("quiz");
+    const timerDisplay = document.getElementById("timer");
+    const resultDiv = document.getElementById("result");
+    const submitBtn = document.getElementById("submitBtn");
+    const newRoundBtn = document.getElementById("newRoundBtn");
+    const roundCountDisplay = document.getElementById("roundCount");
+
+    function getRandomWords(count) {
+      const shuffled = [...allWords].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, count);
+    }
+
+    function startQuiz() {
+      // <CHANGE> Hide start screen and show quiz screen
+      startScreen.classList.add("hidden");
+      quizScreen.classList.add("active");
+
+      resultDiv.textContent = "";
+      quizForm.innerHTML = "";
+      submitBtn.style.display = "inline-block";
+      newRoundBtn.style.display = "none";
+      roundCountDisplay.textContent = roundCount;
+
+      selectedWords = getRandomWords(10);
+
+      selectedWords.forEach((item, i) => {
+        const questionDiv = document.createElement("div");
+        questionDiv.className = "question";
+        questionDiv.innerHTML = `
+          <div class="question-number">Question ${i + 1}</div>
+          <div class="word">${item.word}</div>
+          <div class="options">
+            <label class="option-label" data-question="${i}" data-article="der">
+              <input type="radio" name="q${i}" value="der">
+              <span>der</span>
+            </label>
+            <label class="option-label" data-question="${i}" data-article="die">
+              <input type="radio" name="q${i}" value="die">
+              <span>die</span>
+            </label>
+            <label class="option-label" data-question="${i}" data-article="das">
+              <input type="radio" name="q${i}" value="das">
+              <span>das</span>
+            </label>
+          </div>
+          <button type="button" class="show-meaning" onclick="toggleTranslation(${i})">📖 Show Meaning</button>
+          <div class="translation" id="trans${i}">
+            <strong>Arabic:</strong> ${item.arabic}<br>
+            <strong>English:</strong> ${item.english}
+          </div>
+          <div class="correct-answer-hint" id="hint${i}"></div>
+        `;
+        quizForm.appendChild(questionDiv);
+      });
+
+      startTimer();
+    }
+
+    function startTimer() {
+      clearInterval(interval);
+      timer = 30;
+      updateTimerDisplay();
+
+      interval = setInterval(() => {
+        timer--;
+        updateTimerDisplay();
+        if (timer <= 0) {
+          clearInterval(interval);
+          checkAnswers();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      timerDisplay.textContent = `⏳ ${timer}s`;
+      if (timer <= 10) {
+        timerDisplay.classList.add("warning");
+      } else {
+        timerDisplay.classList.remove("warning");
+      }
+    }
+
+    function checkAnswers() {
+      clearInterval(interval);
+      let score = 0;
+
+      selectedWords.forEach((item, i) => {
+        const answer = document.querySelector(`input[name="q${i}"]:checked`);
+        const optionLabels = document.querySelectorAll(`label[data-question="${i}"]`);
+        const hintDiv = document.getElementById(`hint${i}`);
+
+        document.querySelectorAll(`input[name="q${i}"]`).forEach(input => {
+          input.disabled = true;
+        });
+
+        if (answer && answer.value === item.article) {
+          score++;
+          optionLabels.forEach(label => {
+            if (label.dataset.article === item.article) {
+              label.classList.add("correct");
+            }
+          });
+        } else {
+          optionLabels.forEach(label => {
+            if (answer && label.dataset.article === answer.value) {
+              label.classList.add("incorrect");
+            }
+            if (label.dataset.article === item.article) {
+              label.classList.add("correct");
+            }
+          });
+          hintDiv.textContent = `✅ Correct answer: ${item.article}`;
+          hintDiv.classList.add("show");
+        }
+      });
+
+      resultDiv.innerHTML = `
+        <div>✅ Score: <strong>${score}/10</strong></div>
+        <div style="font-size: 14px; margin-top: 8px; color: #666;">
+          ${score === 10 ? "🎉 Perfect!" : score >= 8 ? "🌟 Great job!" : score >= 6 ? "👍 Good effort!" : "💪 Keep practicing!"}
+        </div>
+      `;
+      submitBtn.style.display = "none";
+      newRoundBtn.style.display = "inline-block";
+    }
+
+    function toggleTranslation(index) {
+      const el = document.getElementById(`trans${index}`);
+      el.classList.toggle("show");
+    }
+
+    // <CHANGE> Add start button event listener
+    startBtn.addEventListener("click", startQuiz);
+
+    submitBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      checkAnswers();
+    });
+
+    newRoundBtn.addEventListener("click", () => {
+      roundCount++;
+      startQuiz();
+    });
+
+    // <CHANGE> Don't start quiz automatically on page load
+  </script>
+</body>
+</html>
